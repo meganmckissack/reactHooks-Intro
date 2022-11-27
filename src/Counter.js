@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 
 // useEffect hook when:
 //   After our component is first rendered. This corresponds to the componentDidMount lifecycle method.
@@ -11,14 +11,36 @@ import React, { useState, useEffect } from "react";
 //   useEffect takes a callback function as an argument, which acts as our "effect". This function is called every time the useEffect hook runs.
 //   useEffect doesn't return anything.
 
+const initialState = {
+  counter: 0
+}
+
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {
+        counter: state.counter + 1
+      };
+    case 'decrement':
+      return {
+        counter: state.counter - 1
+      };
+    default:
+      throw new Error(`There is no action matching ${action.type}.`);
+  }
+}
 
 function Counter() {
-  const [counter, setCounter] = useState(0);
+    // Here we've replaced the useState hook originally used for counter state.
+  const [state, dispatch] = useReducer(reducer, initialState);
+  // const [counter, setCounter] = useState(0);
 
 useEffect(() => {
+  // Now we need to access state.counter to get the counter value.
   console.log('effect');
-  document.title = counter;
-}, [counter]);
+  document.title = state.counter;
+}, [state.counter]);
 // second argument to our useEffect hook: [counter]. This second argument is called a dependency array, and it can contain one or more state variables or props within it. When we add a dependency array to our useEffect hook, we're saying that whether our effect should run depends on whether the value of the state variables in our dependency array have changed
 
 // adding a dependency array to the useEffect hook performs the same functionality as comparing prevState with current state in a componentDidUpdate lifecycle method
@@ -30,9 +52,13 @@ useEffect(() => {
 
   return(
     <React.Fragment>
-      <h1>{counter}</h1>
-      <button onClick={() => setCounter(counter + 1)}>Increase</button>
-      <button onClick={() => setCounter(counter - 1)}>Decrease</button>
+      <h1>{state.counter}</h1>
+      {/* <button onClick={() => setCounter(counter + 1)}>Increase</button>
+      <button onClick={() => setCounter(counter - 1)}>Decrease</button> */}
+      {/* Now we use dispatch() to send an action to our reducer to update state. */}
+      <button onClick={() => dispatch({type: 'increment'})}>Increase</button>
+      <button onClick={() => dispatch({type: 'decrement'})}>Decrease</button>
+
     </React.Fragment>
   )
 }
